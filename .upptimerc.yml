@@ -27,18 +27,20 @@ sites:
 
   - name: Docs
     url: https://docs.intervensecurity.com
+    # Cloudflare Access gates the docs site, so unauthenticated probes get
+    # a 302 redirect to Access. That's "service is up, just gated" — treat
+    # it as healthy. Returns 200 once Access auth completes (humans only).
     expectedStatusCodes:
       - 200
+      - 302
     icon: https://intervensecurity.com/favicon.ico
 
-  - name: Telemetry (internal)
-    # Telemetry is bound to 127.0.0.1 on the gateway VPS — Upptime runs from
-    # GitHub-hosted runners and CANNOT reach it directly. Comment this out
-    # for the public status page; uncomment if you self-host Upptime inside
-    # your VPC.
-    # url: https://telemetry.internal.intervensecurity.com/health
-    # expectedStatusCodes:
-    #   - 200
+# Telemetry (internal) probe intentionally omitted — telemetry is bound to
+# 127.0.0.1 on the gateway VPS and is not reachable from GitHub-hosted runners.
+# If you self-host Upptime inside the VPC, add a probe with:
+#   - name: Telemetry (internal)
+#     url: https://telemetry.internal.intervensecurity.com/health
+#     expectedStatusCodes: [200]
 
 # Status page configuration
 status-website:
