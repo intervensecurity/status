@@ -13,7 +13,7 @@ sites:
     url: https://api.intervensecurity.com/health
     expectedStatusCodes:
       - 200
-    icon: https://intervensecurity.com/favicon.ico
+    icon: https://intervensecurity.com/favicon.png
 
   - name: Console
     url: https://app.intervensecurity.com/api/auth/me
@@ -23,7 +23,7 @@ sites:
     expectedStatusCodes:
       - 200
       - 401
-    icon: https://intervensecurity.com/favicon.ico
+    icon: https://intervensecurity.com/favicon.png
 
   - name: Docs
     url: https://docs.intervensecurity.com
@@ -33,7 +33,7 @@ sites:
     expectedStatusCodes:
       - 200
       - 302
-    icon: https://intervensecurity.com/favicon.ico
+    icon: https://intervensecurity.com/favicon.png
 
 # Telemetry (internal) probe intentionally omitted — telemetry is bound to
 # 127.0.0.1 on the gateway VPS and is not reachable from GitHub-hosted runners.
@@ -45,7 +45,7 @@ sites:
 # Status page configuration
 status-website:
   cname: status.intervensecurity.com
-  logoUrl: https://intervensecurity.com/logo.png
+  logoUrl: https://intervensecurity.com/favicon.png
   name: Interven Status
   introTitle: Interven service status
   introMessage: |
