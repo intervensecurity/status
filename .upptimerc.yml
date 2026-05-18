@@ -1,31 +1,71 @@
-# Change these first
-owner: upptime # Your GitHub organization or username, where this repository lives
-repo: upptime # The name of this repository
+# Interven status page config — drop this file into a fresh GitHub repo
+# (e.g. github.com/intervensecurity/status), enable GitHub Pages from the
+# `gh-pages` branch, and the GitHub Actions Upptime workflow will publish a
+# hosted status site at status.intervensecurity.com (after CNAME setup).
+#
+# See setup steps in services/docs/.../status.md or infra/status-page/README.md.
+
+owner: intervensecurity
+repo: status
 
 sites:
-  - name: Google
-    url: https://www.google.com
-  - name: Wikipedia
-    url: https://en.wikipedia.org
-  - name: Hacker News
-    url: https://news.ycombinator.com
-  - name: Test Broken Site
-    url: https://thissitedoesnotexist.koj.co
+  - name: API gateway
+    url: https://api.intervensecurity.com/health
+    expectedStatusCodes:
+      - 200
+    icon: https://intervensecurity.com/favicon.ico
 
+  - name: Console
+    url: https://app.intervensecurity.com/api/auth/me
+    # /api/auth/me returns 200 when there's no session (with a JSON 401 body).
+    # 401 is expected here — Upptime treats it as "service is up, just rejecting
+    # this request". Use a different endpoint if you want stricter checks.
+    expectedStatusCodes:
+      - 200
+      - 401
+    icon: https://intervensecurity.com/favicon.ico
+
+  - name: Docs
+    url: https://docs.intervensecurity.com
+    expectedStatusCodes:
+      - 200
+    icon: https://intervensecurity.com/favicon.ico
+
+  - name: Telemetry (internal)
+    # Telemetry is bound to 127.0.0.1 on the gateway VPS — Upptime runs from
+    # GitHub-hosted runners and CANNOT reach it directly. Comment this out
+    # for the public status page; uncomment if you self-host Upptime inside
+    # your VPC.
+    # url: https://telemetry.internal.intervensecurity.com/health
+    # expectedStatusCodes:
+    #   - 200
+
+# Status page configuration
 status-website:
-  # Add your custom domain name, or remove the `cname` line if you don't have a domain
-  # Uncomment the `baseUrl` line if you don't have a custom domain and add your repo name there
-  cname: demo.upptime.js.org
-  # baseUrl: /your-repo-name
-  logoUrl: https://raw.githubusercontent.com/upptime/upptime.js.org/master/static/img/icon.svg
-  name: Upptime
-  introTitle: "**Upptime** is the open-source uptime monitor and status page, powered entirely by GitHub."
-  introMessage: This is a sample status page which uses **real-time** data from our [GitHub repository](https://github.com/upptime/upptime). No server required — just GitHub Actions, Issues, and Pages. [**Get your own for free**](https://github.com/upptime/upptime)
+  cname: status.intervensecurity.com
+  logoUrl: https://intervensecurity.com/logo.png
+  name: Interven Status
+  introTitle: Interven service status
+  introMessage: |
+    Real-time uptime for the Interven gateway, console, and docs site. Probes run
+    every 5 minutes from GitHub Actions runners. Subscribe to RSS for incidents
+    and scheduled maintenance.
   navbar:
-    - title: Status
+    - title: Home
       href: /
-    - title: GitHub
-      href: https://github.com/$OWNER/$REPO
+    - title: Incidents
+      href: /history
+    - title: Docs
+      href: https://docs.intervensecurity.com
+    - title: Console
+      href: https://app.intervensecurity.com
 
-# Upptime also supports notifications, assigning issues, and more
-# See https://upptime.js.org/docs/configuration
+# Notifications: set the SLACK_WEBHOOK_URL or DISCORD_WEBHOOK_URL secret in
+# the GitHub repo to get pinged when a probe fails.
+notifications:
+  - type: slack
+    channel: alerts-status
+    helpText: We'll DM you when a service goes down
+
+assignees:
+  - boltyx0    # GitHub username — auto-assigns incidents to you
