@@ -1,0 +1,77 @@
+# Custom Site CI — replaces Upptime's default Static Site CI.
+#
+# Reads the Upptime-generated JSON metrics from master branch's api/ folder
+# and deploys them alongside our custom index.html to the gh-pages branch.
+#
+# Triggers:
+#   - workflow_run: after any Upptime probe workflow completes (so fresh data
+#     gets baked into the site within minutes of each probe)
+#   - workflow_dispatch: manual run from Actions tab
+#   - push: when the site source changes
+#   - schedule: hourly safety net
+#
+# This workflow REPLACES `.github/workflows/site.yml` (Upptime's Static Site CI).
+# Delete that file to avoid the two workflows racing for control of gh-pages.
+
+name: Custom Site CI
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'site/**'
+      - '.github/workflows/custom-site.yml'
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "Uptime CI"
+      - "Response Time CI"
+      - "Graphs CI"
+      - "Summary CI"
+    types:
+      - completed
+  schedule:
+    # Hourly safety net — keeps the page fresh even if other workflows misfire.
+    - cron: '0 * * * *'
+
+# Cancel any older in-flight build when a new one starts; we only ever want
+# the latest snapshot of the data on gh-pages.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v4
+
+      - name: Assemble static site
+        run: |
+          set -euo pipefail
+          mkdir -p _site
+          # Custom HTML/CSS/JS from site/
+          cp -r site/. _site/
+          # Upptime-generated metrics
+          if [ -d api ]; then cp -r api _site/api; fi
+          # CNAME so GitHub Pages keeps custom domain mapping
+          echo "status.intervensecurity.com" > _site/CNAME
+          # Disable Jekyll processing on the deployed branch
+          touch _site/.nojekyll
+          # Quick sanity check
+          ls -la _site/
+          echo "Service slugs found in api/:"
+          ls _site/api/ 2>/dev/null || echo "(no api data yet — page will show 'Awaiting first probe')"
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
+          publish_branch: gh-pages
+          force_orphan: true
+          commit_message: "Deploy status page (${{ github.event_name }})"
