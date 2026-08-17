@@ -1,7 +1,7 @@
 url: https://api.intervensecurity.com/health
-status: down
-code: 525
-responseTime: 49522
-lastUpdated: 2026-08-17T15:42:01.823Z
+status: up
+code: 200
+responseTime: 47721
+lastUpdated: 2026-08-17T15:59:55.282Z
 startTime: 2026-05-18T10:27:05.686Z
 generator: Upptime <https://github.com/upptime/upptime>
